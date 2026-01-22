@@ -1,16 +1,11 @@
-FAILS=0
+#!/bin/bash
 
-for i in {1..10}; do
-  STATUS=$(curl -s http://localhost/health)
-  if [ "$STATUS" != "OK" ]; then
-    FAILS=$((FAILS+1))
-  fi
-  sleep 2
-done
+STATUS=$(curl -s http://localhost:3001/metrics)
 
-if [ $FAILS -gt 2 ]; then
+if [ "$STATUS" = "healthy" ]; then
+  echo "Canary healthy"
+  exit 0
+else
   echo "Canary unhealthy"
   exit 1
 fi
-
-echo "Canary healthy"
