@@ -1,24 +1,20 @@
-const http = require("http");
-const PORT = 3000;
-const VERSION = process.env.VERSION;
-const START = Date.now();
+const http = require('http');
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/health") {
-    res.end("OK");
-    return;
+  if (req.url === '/health') {
+    res.writeHead(200);
+    return res.end('OK');
   }
 
-  if (req.url === "/metrics") {
-    res.end(JSON.stringify({
-      version: VERSION,
-      uptime: Date.now() - START
-    }));
-    return;
+  if (req.url === '/metrics') {
+    res.writeHead(200);
+    return res.end('healthy');
   }
 
-  res.setHeader("X-App-Version", VERSION);
-  res.end(`🚀 Smart CI/CD Platform | Version ${VERSION}`);
+  res.writeHead(200);
+  res.end('Hello from Canary App');
 });
 
-server.listen(PORT);
+server.listen(3000, () => {
+  console.log('App running on port 3000');
+});
