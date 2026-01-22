@@ -1,21 +1,24 @@
-const http = require('http');
-
+const http = require("http");
 const PORT = 3000;
-const VERSION = process.env.VERSION || "v1";
+const VERSION = process.env.VERSION;
+const START = Date.now();
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/health') {
-    res.writeHead(200);
+  if (req.url === "/health") {
     res.end("OK");
-  } else if (req.url === '/version') {
-    res.writeHead(200);
-    res.end(`App Version: ${VERSION}`);
-  } else {
-    res.writeHead(200);
-    res.end("Smart CI/CD App Running");
+    return;
   }
+
+  if (req.url === "/metrics") {
+    res.end(JSON.stringify({
+      version: VERSION,
+      uptime: Date.now() - START
+    }));
+    return;
+  }
+
+  res.setHeader("X-App-Version", VERSION);
+  res.end(`🚀 Smart CI/CD Platform | Version ${VERSION}`);
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+server.listen(PORT);

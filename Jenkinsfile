@@ -1,39 +1,35 @@
 pipeline {
   agent any
 
-  environment {
-    APP_NAME = "smart-app"
-  }
-
   stages {
-    stage('Clone') {
+    stage('Build & Test') {
       steps {
-        checkout scm
-      }
-    }
-
-    stage('Build Image') {
-      steps {
-        sh 'docker build -t $APP_NAME:$BUILD_NUMBER .'
-      }
-    }
-
-    stage('Test') {
-      steps {
+        sh 'docker build -t smart-app:$BUILD_NUMBER .'
         sh 'bash scripts/test.sh'
       }
     }
 
     stage('Deploy Staging') {
       steps {
-        sh 'bash scripts/deploy.sh staging'
+        sh 'bash scripts/deploy_staging.sh'
       }
     }
 
-    stage('Canary Deploy') {
+    stage('Deploy Canary') {
       steps {
-        sh 'bash scripts/deploy.sh canary'
-        sh 'bash scripts/health_check.sh'
+        sh 'bash scripts/deploy_canary.sh'
+      }
+    }
+
+    stage('Analyze Metrics') {
+      steps {
+        sh 'bash scripts/analyze_metrics.sh'
+      }
+    }
+
+    stage('Promote Canary') {
+      steps {
+        sh 'bash scripts/promote.sh'
       }
     }
   }
@@ -44,4 +40,3 @@ pipeline {
     }
   }
 }
-
